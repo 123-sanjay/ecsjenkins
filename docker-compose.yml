@@ -1,0 +1,46 @@
+version: '2'
+services:
+  nodejs:
+    image: 'sanjay/node-web-app'
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name:  nodejs
+    restart: unless-stopped
+    volumes:
+      - /root/node_docker:/usr/src/app
+    ports: 
+      - "8888:8888"
+    networks:
+      test:
+        ipv4_address: 172.1.0.2
+  webserver:
+    image: nginx
+    container_name: webserver
+    restart: unless-stopped
+    volumes:
+      - ./nginx-conf:/etc/nginx/conf.d
+      - ./cert:/etc/nginx/cert/
+    depends_on:
+      - nodejs
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      test:
+        ipv4_address: 172.1.0.3
+volumes:
+  node_docker:
+  nginx-conf:
+  
+  
+networks:
+  test:
+    ipam:
+      config:
+        - subnet: 172.1.0.0/16
+          ip_range: 172.1.0.0/24
+
+      
+ 
+
